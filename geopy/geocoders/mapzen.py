@@ -25,6 +25,7 @@ class Mapzen(Geocoder):
             self,
             api_key,
             format_string=DEFAULT_FORMAT_STRING,
+            api_url=None,
             boundary_rect=None,
             country_bias=None,
             timeout=DEFAULT_TIMEOUT,
@@ -57,9 +58,10 @@ class Mapzen(Geocoder):
         self.format_string = format_string
         self.boundary_rect = boundary_rect
         self.api_key = api_key
+        self.api_url = api_url if api_url else 'https://search.mapzen.com/v1/search'
 
-        self.geocode_api = 'https://search.mapzen.com/v1/search'
-        self.reverse_api = 'https://search.mapzen.com/v1/reverse'
+        self.geocode_api = '{}/v1/search'.format(self.api_url)
+        self.reverse_api = '{}/v1/reverse'.format(self.api_url)
 
     def geocode(
             self,
@@ -88,9 +90,10 @@ class Mapzen(Geocoder):
         """
         params = {'text': self.format_string % query}
 
-        params.update({
-            'api_key': self.api_key
-        })
+        if self.api_key:
+            params.update({
+                'api_key': self.api_key
+            })
 
         if self.boundary_rect:
             params['boundary.rect.min_lon'] = self.boundary_rect[0]
